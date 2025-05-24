@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Bubble Sort – Bubble Dance</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #ffe3f0, #fff5fb);
+      text-align: center;
+      padding: 50px;
+      color: #444;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #d63384;
+      margin-bottom: 20px;
+    }
+
+    .card-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px;
+    }
+
+    .card {
+      padding: 20px;
+      background-color: #ffc0cb;
+      border: 2px solid #ff69b4;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 50px;
+      font-size: 20px;
+    }
+
+    #swap-count,
+    #timer {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 12px 25px;
+      background-color: #ff70a6;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 10px 0;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #fa3e80;
+      transform: scale(1.05);
+    }
+
+    #infoModal {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      background: white;
+      border: 2px solid #ff70a6;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    #infoModal h2 {
+      color: #d63384;
+    }
+
+    #infoModal button {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🩷 Bubble Sort Dance</h1>
+  <p>Only <strong>adjacent</strong> cards can be clicked to swap their positions!</p>
+
+  <div class="card-container" id="cards"></div>
+
+  <div id="swap-count">Swaps: 0</div>
+  <div id="timer">Time left: 05:00</div>
+
+  <div id="retry-section" style="display: none; margin-top: 20px;">
+    <button onclick="retry()">🔁 Try Again</button>
+  </div>
+  <button onclick="checkOrder()">✅ Check Order</button>
+  <button onclick="goHome()">🏠 Home</button>
+  <button onclick="goLeaderboard()">📊 Leaderboard</button>
+  <button onclick="openInfo()">ℹ️ Info</button>
+
+
+  <div id="infoModal">
+    <h2>📘 Bubble Sort – Bubble Dance</h2>
+    <p>
+      You receive 5 shuffled number cards (e.g., 5-2-4-1-3).<br><br>
+      On each turn, you may compare and swap only <strong>adjacent</strong> cards.<br><br>
+      <strong>Goal:</strong> Sort the numbers in ascending order using the fewest swaps possible.<br><br>
+      🔍 <strong>Algorithm Insight:</strong><br>
+      This simulates the Bubble Sort algorithm. In the worst case, it runs in O(n²) time.<br>
+      Each pass "bubbles up" the largest number to the end.<br><br>
+      🧠 As the list becomes sorted, no swaps are needed – demonstrating the optimized version of Bubble Sort.<br><br>
+      📈 More efficient algorithms for real use cases:<br>
+      ✅ Merge Sort – O(n log n)<br>
+      ✅ Quick Sort – Avg. O(n log n)
+    </p>
+    <button onclick="closeInfo()">Close</button>
+  </div>
+
+  <script>
+    function countInversions(array) {
+      let inversions = 0;
+      for (let i = 0; i < array.length; i++) {
+        for (let j = i + 1; j < array.length; j++) {
+          if (array[i] > array[j]) inversions++;
+        }
+      }
+      return inversions;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get("user") || "Anonymous";
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function isSorted(arr) {
+      for (let i = 1; i < arr.length; i++) {
+        if (arr[i] < arr[i - 1]) return false;
+      }
+      return true;
+    }
+
+    let cards;
+    do {
+      cards = shuffleArray([1, 2, 3, 4, 5]);
+    } while (isSorted(cards));
+
+    const originalCards = [...cards];
+    const idealSwaps = countInversions(originalCards);
+
+
+    let swapCount = 0;
+    let firstSelected = null;
+    let timeLeft = 300;
+    let gameOver = false;
+
+    function renderCards() {
+      const container = document.getElementById("cards");
+      container.innerHTML = "";
+      cards.forEach((num, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerText = num;
+        card.onclick = () => {
+          if (!gameOver) selectCard(index);
+        };
+        container.appendChild(card);
+      });
+    }
+
+    function selectCard(index) {
+      if (firstSelected === null) {
+        firstSelected = index;
+      } else {
+        const second = index;
+        if (Math.abs(firstSelected - second) === 1) {
+          [cards[firstSelected], cards[second]] = [cards[second], cards[firstSelected]];
+          swapCount++;
+          document.getElementById("swap-count").innerText = "Swaps: " + swapCount;
+        } else {
+          alert("Only adjacent cards can be swapped!");
+        }
+        firstSelected = null;
+        renderCards();
+      }
+    }
+
+    function checkOrder() {
+      if (gameOver) {
+        alert("⏰ Time is up. You can’t check anymore.");
+        return;
+      }
+
+      const sorted = [...cards].sort((a, b) => a - b);
+      if (JSON.stringify(cards) === JSON.stringify(sorted)) {
+        gameOver = true;
+        alert("🎉 Well done! You sorted the cards correctly.");
+
+        const extraSwaps = Math.max(0, swapCount - idealSwaps);
+        const score = Math.max(100 - extraSwaps * 10, 0);
+
+        fetch('/submit_score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username,
+            game: "Bubble Sort",
+            score: score,
+            details: `Swaps: ${swapCount}, Ideal: ${idealSwaps}, Score: ${score}`
+          })
+        })
+          .then(res => res.json())
+          .then(data => console.log(data.message));
+      } else {
+        alert("❗ Not sorted yet, try again!");
+      }
+    }
+
+    function updateTimerDisplay() {
+      const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const sec = String(timeLeft % 60).padStart(2, '0');
+      document.getElementById("timer").innerText = `Time left: ${min}:${sec}`;
+    }
+
+    function startCountdown() {
+      const interval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          gameOver = true;
+          alert("⏰ Time's up! You ran out of time.");
+          document.getElementById("retry-section").style.display = "block";
+        } else {
+          timeLeft--;
+          updateTimerDisplay();
+        }
+      }, 1000);
+    }
+
+
+    function goHome() {
+      window.location.href = "/?user=" + encodeURIComponent(username);
+    }
+
+    function goLeaderboard() {
+      window.location.href = "/leaderboard";
+    }
+
+    function openInfo() {
+      document.getElementById("infoModal").style.display = "block";
+    }
+
+    function closeInfo() {
+      document.getElementById("infoModal").style.display = "none";
+    }
+    function retry() {
+      location.reload();
+    }
+
+    renderCards();
+    updateTimerDisplay();
+    startCountdown();
+  </script>
+</body>
+
+</html>

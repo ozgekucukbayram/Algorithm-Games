@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Binary Search – Guess!</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #ffe3f0, #fff5fb);
+      text-align: center;
+      padding: 50px;
+      color: #444;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #d63384;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 16px;
+      width: 100px;
+      border-radius: 10px;
+      border: 2px solid #ff70a6;
+      text-align: center;
+    }
+
+    button {
+      padding: 12px 25px;
+      background-color: #ff70a6;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #fa3e80;
+      transform: scale(1.05);
+    }
+
+    #feedback {
+      margin-top: 25px;
+      font-size: 18px;
+      color: #444;
+    }
+
+    #attempt-count {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    #infoModal {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      background: white;
+      border: 2px solid #ff70a6;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    #infoModal h2 {
+      color: #d63384;
+    }
+
+    #infoModal button {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🔍 Binary Search Task</h1>
+  <p>Find the number I have between 1–100 in the fewest steps!</p>
+
+  <input type="number" id="guess" placeholder="Your guess" min="1" max="100">
+  <button onclick="makeGuess()">Guess</button>
+
+  <div id="feedback"></div>
+  <div id="attempt-count">Attempts: 0</div>
+  <div id="timer">Time left: 05:00</div>
+
+  <div style="margin-top: 30px;">
+
+    <div id="retry-section" style="display:none; margin-top: 20px;">
+      <button onclick="retry()">🔁 Try Again</button>
+    </div>
+
+    <button onclick="goHome()">🏠 Main Menu</button>
+    <button onclick="goLeaderboard()">📊 Leaderboard</button>
+    <button onclick="openInfo()">ℹ️ Info</button>
+  </div>
+
+  <div id="infoModal">
+    <h2>📘 How It Works – Binary Search</h2>
+    <p>
+      🔍 <strong>How to Play:</strong><br>
+      I’m thinking of a number between 1 and 100. Your task is to find it in the fewest steps possible.<br>
+      Try halving the search space each time to guess faster!<br><br>
+
+      🧠 <strong>Algorithm Insight:</strong><br>
+      Binary Search is a powerful algorithm that cuts the list in half each time.<br>
+      Its time complexity is <strong>O(log n)</strong>, which makes it very efficient for large datasets.<br>
+      The only requirement is that the list must be sorted.<br><br>
+
+      📈 <strong>Comparison:</strong><br>
+      • Linear Search → O(n) → checks every element one by one.<br>
+      • Binary Search → O(log n) → halves the list with each guess.<br><br>
+
+      ⭐ A great way to learn how efficient logarithmic algorithms can be!
+    </p>
+    <button onclick="closeInfo()">Close</button>
+  </div>
+
+<div id="retry-section" style="display:none; margin-top: 20px;">
+  <button onclick="retry()">🔁 Try Again</button>
+</div>
+
+ <script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const username = urlParams.get('user') || "Anonymous";
+  const secret = Math.floor(Math.random() * 100) + 1;
+  let steps = 0;
+  let timeLeft = 300;
+  let gameOver = false;
+
+  function updateTimerDisplay() {
+    const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+    const sec = String(timeLeft % 60).padStart(2, '0');
+    document.getElementById("timer").innerText = `Time left: ${min}:${sec}`;
+  }
+
+  function startCountdown() {
+    const interval = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        gameOver = true;
+        alert("⏰ Time's up! You ran out of time.");
+        document.getElementById("feedback").innerText = "❌ Game over. Please restart.";
+        document.getElementById("guess").disabled = true;
+        document.querySelector("button[onclick='makeGuess()']").disabled = true;
+        document.getElementById("retry-section").style.display = "block";
+      } else if (!gameOver) {
+        timeLeft--;
+        updateTimerDisplay();
+      }
+    }, 1000);
+  }
+
+function makeGuess() {
+  if (gameOver) return;
+  const guess = parseInt(document.getElementById("guess").value);
+  if (isNaN(guess) || guess < 1 || guess > 100) {
+    alert("You must enter a number between 1 and 100.");
+    return;
+  }
+
+  steps++;
+  document.getElementById("attempt-count").innerText = "Attempts: " + steps;
+
+  const feedback = document.getElementById("feedback");
+
+  if (guess === secret) {
+    gameOver = true;
+    feedback.innerHTML = `🎯 Congratulations ${username}! You found the number in ${steps} steps.<br>
+      This shows the power of <strong>O(log n)</strong> complexity!`;
+
+    const maxIdealSteps = 7;
+    const penaltyPerExtraStep = 10;
+    const extraSteps = Math.max(0, steps - maxIdealSteps);
+    const score = Math.max(100 - penaltyPerExtraStep * extraSteps, 0);
+
+    fetch('/submit_score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username,
+        game: "Binary Search",
+        score: score,
+        details: `Found in ${steps} steps (Ideal: ${maxIdealSteps}, Score: ${score})`
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log(data.message);
+    });
+
+  } else if (guess < secret) {
+    feedback.innerText = "🔼 Try a bigger number!";
+  } else {
+    feedback.innerText = "🔽 Try a smaller number!";
+  }
+}
+
+
+  function retry() {
+    location.reload();
+  }
+
+  function goHome() {
+    window.location.href = "/?user=" + encodeURIComponent(username);
+  }
+
+  function goLeaderboard() {
+    window.location.href = "/leaderboard";
+  }
+
+  function openInfo() {
+    document.getElementById("infoModal").style.display = "block";
+  }
+
+  function closeInfo() {
+    document.getElementById("infoModal").style.display = "none";
+  }
+
+  updateTimerDisplay();
+  startCountdown();
+</script>
+</body>
+</html>

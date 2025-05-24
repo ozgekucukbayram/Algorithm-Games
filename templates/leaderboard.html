@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Leaderboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #ffe3f0, #fff5fb);
+      text-align: center;
+      padding: 40px;
+      color: #444;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #d63384;
+      margin-bottom: 30px;
+    }
+
+    table {
+      margin: auto;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      background-color: white;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    th {
+      background-color: #ffc0cb;
+      color: #333;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    p {
+      font-size: 18px;
+      color: #888;
+    }
+
+    .button {
+      margin-top: 30px;
+      padding: 12px 25px;
+      background-color: #ff70a6;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .button:hover {
+      background-color: #fa3e80;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>🏆 Leaderboard</h1>
+
+  {% if scores %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>User</th>
+          <th>Game</th>
+          <th>score</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in scores %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ s.username }}</td>
+          <td>{{ s.game }}</td>
+          <td>{{ s.score }}</td>
+          <td>{{ s.details }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No points have been sent yet 😔</p>
+  {% endif %}
+  <button class="button" onclick="window.location.href='/'">🏠 Main Menu</button>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Algorithm Games</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #ffe3f0, #fff5fb);
+      text-align: center;
+      padding: 50px;
+      color: #444;
+    }
+
+    h1 {
+      font-size: 40px;
+      color: #d63384;
+      margin-bottom: 10px;
+    }
+
+    form {
+      margin-bottom: 30px;
+    }
+
+    input[type="text"] {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: 2px solid #d63384;
+      border-radius: 10px;
+      outline: none;
+      width: 250px;
+      margin-top: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 30px;
+    }
+
+    li {
+      margin: 15px 0;
+    }
+
+    a.game-link {
+      display: inline-block;
+      background-color: #ff70a6;
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      padding: 12px 25px;
+      border-radius: 20px;
+      transition: 0.2s ease;
+    }
+
+    a.game-link:hover {
+      background-color: #fa3e80;
+      transform: scale(1.05);
+    }
+
+    a.leaderboard-link {
+      margin-top: 30px;
+      display: inline-block;
+      font-size: 16px;
+      text-decoration: underline;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Algorithm Games 🌸</h1>
+
+  <form onsubmit="return false;">
+    <label for="username"><strong>Enter your name:</strong></label><br>
+    <input type="text" id="username" placeholder="e.g. Binary Blossom" required>
+  </form>
+
+  <ul>
+    <li><a href="#" class="game-link" onclick="goToGame('bubble')">🩷 Bubble Sort Dance</a></li>
+    <li><a href="#" class="game-link" onclick="goToGame('greedy')">💼 Greedy – Treasure Hunt</a></li>
+    <li><a href="#" class="game-link" onclick="goToGame('binary')">🔍 Binary Search Mission</a></li>
+  </ul>
+
+  <a href="{{ url_for('leaderboard') }}" class="leaderboard-link">📊 View Leaderboard</a>
+
+  <script>
+    function goToGame(gameRoute) {
+      const username = document.getElementById("username").value.trim();
+      if (!username) {
+        alert("Please enter your name!");
+        return;
+      }
+      window.location.href = "/" + gameRoute + "?user=" + encodeURIComponent(username);
+    }
+  </script>
+</body>
+</html>

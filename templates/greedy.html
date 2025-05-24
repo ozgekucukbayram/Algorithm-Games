@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Greedy Treasure Hunt</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #ffe3f0, #fff5fb);
+      text-align: center;
+      padding: 50px;
+      color: #444;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #d63384;
+      margin-bottom: 20px;
+    }
+
+    .item-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .item {
+      border: 2px solid #ffa500;
+      border-radius: 10px;
+      padding: 10px;
+      width: 150px;
+      background-color: #fff3cd;
+    }
+
+    .selected {
+      background-color: #90ee90;
+    }
+
+    button {
+      padding: 12px 25px;
+      background-color: #ff70a6;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 10px 0;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #fa3e80;
+      transform: scale(1.05);
+    }
+
+    #infoModal {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      background: white;
+      border: 2px solid #ff70a6;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+
+    #infoModal h2 {
+      color: #d63384;
+    }
+
+    #infoModal button {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>💼 Greedy Treasure Hunt</h1>
+  <p>Fill your 15kg bag with your most valuable items!</p>
+
+  <div class="item-list" id="items"></div>
+
+  <div style="margin-top: 20px;">
+    <strong>Remaining Capacity:</strong> <span id="remaining-weight">15</span> kg <br>
+    <strong>Total Value:</strong> <span id="total-value">0</span>
+  </div>
+<div id="timer" style="margin-top: 20px; font-size: 18px;">Time left: 05:00</div>
+<div id="retry-section" style="display: none; margin-top: 20px;">
+  <button onclick="retry()">🔁 Try Again</button>
+</div>
+
+  <button onclick="finish()">✅ Finish Mission</button>
+  <button onclick="goHome()">🏠 Main Menu</button>
+  <button onclick="goLeaderboard()">📊 Leaderboard</button>
+  <button onclick="openInfo()">ℹ️ Info</button>
+
+  <div id="infoModal">
+    <h2>📘 How It Works – Greedy Treasure Hunt</h2>
+    <p>
+      🕹️ <strong>How to Play:</strong><br>
+      You’re given 10 items, each with a random <strong>weight</strong> and <strong>value</strong>.<br>
+      Your bag can hold <strong>15kg</strong> max. Choose the most valuable combination of items.<br><br>
+
+      🧠 <strong>Algorithm Insight:</strong><br>
+      This game teaches the Greedy Algorithm, inspired by the <strong>Fractional Knapsack</strong> problem.<br>
+      Items are sorted by <strong>value-to-weight ratio</strong> and selected accordingly.<br>
+      It runs in <strong>O(n log n)</strong> time due to sorting.<br><br>
+
+      📈 <strong>Comparison:</strong><br>
+      • Greedy is fast and intuitive, but doesn't always give the perfect result for 0/1 Knapsack.<br>
+      • For perfect combinations, we’d use <strong>Dynamic Programming</strong> → O(nW)<br><br>
+
+      ⭐ This game helps understand how greedy decisions work when optimizing under constraints!
+    </p>
+    <button onclick="closeInfo()">Close</button>
+  </div>
+
+ <script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const username = urlParams.get("user") || "Anonymous";
+  const maxWeight = 15;
+  let currentWeight = 0, currentValue = 0;
+  let timeLeft = 300;
+  let gameOver = false;
+
+  const itemNames = ["Diamond", "Gold", "Silver", "Clock", "Book", "Laptop", "Camera", "Telephone", "Pencil", "Wallet"];
+  const items = itemNames.map(name => ({
+    name,
+    weight: parseFloat((Math.random() * 4 + 0.5).toFixed(1)),
+    value: Math.floor(Math.random() * 91) + 10
+  }));
+
+  const selectedItems = new Set();
+
+  function renderItems() {
+    const container = document.getElementById("items");
+    container.innerHTML = "";
+    items.forEach((item, i) => {
+      const div = document.createElement("div");
+      div.className = "item" + (selectedItems.has(i) ? " selected" : "");
+      div.innerHTML = `
+        <strong>${item.name}</strong><br>
+        🏋️ ${item.weight} kg<br>
+        💰 ${item.value} Score<br>
+        <button onclick="selectItem(${i})" ${gameOver ? "disabled" : ""}>Select</button>`;
+      container.appendChild(div);
+    });
+    document.getElementById("remaining-weight").innerText = (maxWeight - currentWeight).toFixed(1);
+    document.getElementById("total-value").innerText = currentValue;
+  }
+
+  function selectItem(i) {
+    if (gameOver) return;
+    const item = items[i];
+    if (selectedItems.has(i)) {
+      selectedItems.delete(i);
+      currentWeight -= item.weight;
+      currentValue -= item.value;
+    } else if (currentWeight + item.weight <= maxWeight) {
+      selectedItems.add(i);
+      currentWeight += item.weight;
+      currentValue += item.value;
+    } else {
+      alert("Bag capacity is full!");
+    }
+    renderItems();
+  }
+function getOptimalKnapsackValue(items, capacity) {
+  const W = Math.round(capacity * 10); 
+  const n = items.length;
+  const dp = new Array(W + 1).fill(0);
+
+  for (let i = 0; i < n; i++) {
+    const itemWeight = Math.round(items[i].weight * 10);
+    const itemValue = items[i].value;
+    for (let w = W; w >= itemWeight; w--) {
+      dp[w] = Math.max(dp[w], dp[w - itemWeight] + itemValue);
+    }
+  }
+
+  return dp[W];
+}
+
+function finish() {
+  if (gameOver) {
+    alert("⏰ Time is up. You can't finish the mission anymore.");
+    return;
+  }
+
+  const kalan = (maxWeight - currentWeight).toFixed(1);
+const greedyMax = getOptimalKnapsackValue(items, Math.floor(maxWeight));
+  const normalized = Math.round((currentValue / greedyMax) * 100);
+
+  alert(`🎉 Mission Completed ${username}!\nTotal Value: ${currentValue} pts\nGreedy Max: ${greedyMax}\nScore: ${normalized}/100\nRemaining: ${kalan} kg`);
+
+  if (currentValue > greedyMax) {
+    alert("ℹ️ Note: You achieved a higher score than the greedy estimate!\nThis means the greedy algorithm didn't find the optimal set in this 0/1 Knapsack case.\nGreedy is fast, but not always perfect!");
+  }
+
+  fetch("/submit_score", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      game: "Greedy Treasure Hunt",
+      score: normalized,
+      details: `Raw: ${currentValue}, Greedy Max: ${greedyMax}, Weight: ${currentWeight.toFixed(1)} kg`
+    })
+  }).then(res => res.json()).then(data => console.log(data.message));
+}
+
+  function updateTimerDisplay() {
+    const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+    const sec = String(timeLeft % 60).padStart(2, '0');
+    document.getElementById("timer").innerText = `Time left: ${min}:${sec}`;
+  }
+
+function startCountdown() {
+  const interval = setInterval(() => {
+    if (timeLeft <= 0) {
+      clearInterval(interval);
+      gameOver = true;
+      alert("⏰ Time's up! The mission has ended.");
+      document.getElementById("retry-section").style.display = "block"; 
+      renderItems(); 
+    } else {
+      timeLeft--;
+      updateTimerDisplay();
+    }
+  }, 1000);
+}
+
+  function goHome() {
+    window.location.href = "/?user=" + encodeURIComponent(username);
+  }
+
+  function goLeaderboard() {
+    window.location.href = "/leaderboard";
+  }
+
+  function openInfo() {
+    document.getElementById("infoModal").style.display = "block";
+  }
+
+  function closeInfo() {
+    document.getElementById("infoModal").style.display = "none";
+  }
+function retry() {
+  location.reload(); 
+}
+  renderItems();
+  updateTimerDisplay();
+  startCountdown();
+</script>
+</body>
+</html>
