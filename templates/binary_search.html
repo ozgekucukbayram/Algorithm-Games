@@ -121,12 +121,7 @@
       ⭐ A great way to learn how efficient logarithmic algorithms can be!
     </p>
     <button onclick="closeInfo()">Close</button>
-  </div>
-
-<div id="retry-section" style="display:none; margin-top: 20px;">
-  <button onclick="retry()">🔁 Try Again</button>
-</div>
-
+    </div>
  <script>
   const urlParams = new URLSearchParams(window.location.search);
   const username = urlParams.get('user') || "Anonymous";
@@ -172,35 +167,39 @@ function makeGuess() {
   const feedback = document.getElementById("feedback");
 
   if (guess === secret) {
-    gameOver = true;
-    feedback.innerHTML = `🎯 Congratulations ${username}! You found the number in ${steps} steps.<br>
-      This shows the power of <strong>O(log n)</strong> complexity!`;
+  gameOver = true;
+  feedback.innerHTML = `🎯 Congratulations ${username}! You found the number in ${steps} steps.<br>
+    This shows the power of <strong>O(log n)</strong> complexity!`;
 
-    const maxIdealSteps = 7;
-    const penaltyPerExtraStep = 10;
-    const extraSteps = Math.max(0, steps - maxIdealSteps);
-    const score = Math.max(100 - penaltyPerExtraStep * extraSteps, 0);
+  const maxIdealSteps = 7;
+  const penaltyPerExtraStep = 10;
+  const extraSteps = Math.max(0, steps - maxIdealSteps);
+  const score = Math.max(100 - penaltyPerExtraStep * extraSteps, 0);
 
-    fetch('/submit_score', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: username,
-        game: "Binary Search",
-        score: score,
-        details: `Found in ${steps} steps (Ideal: ${maxIdealSteps}, Score: ${score})`
-      })
+  // ✅ EKLE: retry-section'ı göster
+  document.getElementById("retry-section").style.display = "block";
+
+  fetch('/submit_score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: username,
+      game: "Binary Search",
+      score: score,
+      details: `Found in ${steps} steps (Ideal: ${maxIdealSteps}, Score: ${score})`
     })
-    .then(res => res.json())
-    .then(data => {
-      console.log(data.message);
-    });
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log(data.message);
+  });
 
-  } else if (guess < secret) {
-    feedback.innerText = "🔼 Try a bigger number!";
-  } else {
-    feedback.innerText = "🔽 Try a smaller number!";
-  }
+} else if (guess < secret) {
+  feedback.innerText = "🔼 Try a bigger number!";
+} else {
+  feedback.innerText = "🔽 Try a smaller number!";
+}
+
 }
 
 

@@ -1,62 +1,38 @@
 [
     {
-        "username": "ar\u0131",
-        "game": "Binary Search",
-        "score": 50,
-        "details": "Found in 5 steps"
+        "username": "\u00f6zge",
+        "game": "Selection Sort",
+        "score": 100,
+        "details": "Swaps: 4, Ideal: 4, Score: 100"
     },
     {
-        "username": "ar\u0131",
-        "game": "Binary Search",
-        "score": 0,
-        "details": "Found in 19 steps"
+        "username": "\u00f6zge",
+        "game": "Selection Sort",
+        "score": 60,
+        "details": "Swaps: 7, Ideal: 3, Score: 60"
+    },
+    {
+        "username": "ildeniz",
+        "game": "Greedy Treasure Hunt",
+        "score": 95,
+        "details": "Raw: 487, Greedy Max: 511, Weight: 14.4 kg"
+    },
+    {
+        "username": "ildeniz",
+        "game": "Greedy Treasure Hunt",
+        "score": 100,
+        "details": "Raw: 548, Greedy Max: 548, Weight: 14.5 kg"
     },
     {
         "username": "ildeniz",
         "game": "Binary Search",
         "score": 100,
-        "details": "Found in 6 steps (Ideal: 7, Score: 100)"
+        "details": "Found in 7 steps (Ideal: 7, Score: 100)"
     },
     {
         "username": "\u00f6zge",
         "game": "Binary Search",
         "score": 60,
         "details": "Found in 11 steps (Ideal: 7, Score: 60)"
-    },
-    {
-        "username": "ar\u0131",
-        "game": "Greedy Treasure Hunt",
-        "score": 44,
-        "details": "Raw: 165, Greedy Max: 373, Weight: 7.4 kg"
-    },
-    {
-        "username": "ar\u0131",
-        "game": "Bubble Sort",
-        "score": 35,
-        "details": "Swaps made: 13"
-    },
-    {
-        "username": "ar\u0131",
-        "game": "Bubble Sort",
-        "score": 60,
-        "details": "Swaps: 12, Ideal: 8, Score: 60"
-    },
-    {
-        "username": "\u00f6zge",
-        "game": "Binary Search",
-        "score": 100,
-        "details": "Found in 6 steps (Ideal: 7, Score: 100)"
-    },
-    {
-        "username": "osman",
-        "game": "Bubble Sort",
-        "score": 100,
-        "details": "Swaps: 3, Ideal: 3, Score: 100"
-    },
-    {
-        "username": "osman",
-        "game": "Greedy Treasure Hunt",
-        "score": 99,
-        "details": "Raw: 359, Greedy Max: 362, Weight: 13.9 kg"
     }
 ]

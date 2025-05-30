@@ -10,9 +10,9 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-@app.route('/bubble')
-def bubble_sort_game():
-    return render_template("bubble_sort.html")
+@app.route('/selection')
+def selection_sort_game():
+    return render_template("selection_sort.html")
 
 @app.route('/greedy')
 def greedy_game():

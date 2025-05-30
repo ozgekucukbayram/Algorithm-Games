@@ -125,6 +125,8 @@
   let currentWeight = 0, currentValue = 0;
   let timeLeft = 300;
   let gameOver = false;
+  let interval;
+
 
   const itemNames = ["Diamond", "Gold", "Silver", "Clock", "Book", "Laptop", "Camera", "Telephone", "Pencil", "Wallet"];
   const items = itemNames.map(name => ({
@@ -190,8 +192,11 @@ function finish() {
     return;
   }
 
+  gameOver = true; // ✅ Bunu da unutma
+  clearInterval(interval); // ✅ Süreyi durdur
+
   const kalan = (maxWeight - currentWeight).toFixed(1);
-const greedyMax = getOptimalKnapsackValue(items, Math.floor(maxWeight));
+  const greedyMax = getOptimalKnapsackValue(items, Math.floor(maxWeight));
   const normalized = Math.round((currentValue / greedyMax) * 100);
 
   alert(`🎉 Mission Completed ${username}!\nTotal Value: ${currentValue} pts\nGreedy Max: ${greedyMax}\nScore: ${normalized}/100\nRemaining: ${kalan} kg`);
@@ -210,7 +215,10 @@ const greedyMax = getOptimalKnapsackValue(items, Math.floor(maxWeight));
       details: `Raw: ${currentValue}, Greedy Max: ${greedyMax}, Weight: ${currentWeight.toFixed(1)} kg`
     })
   }).then(res => res.json()).then(data => console.log(data.message));
+
+  document.getElementById("retry-section").style.display = "block";
 }
+
 
   function updateTimerDisplay() {
     const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
@@ -219,7 +227,7 @@ const greedyMax = getOptimalKnapsackValue(items, Math.floor(maxWeight));
   }
 
 function startCountdown() {
-  const interval = setInterval(() => {
+  interval = setInterval(() => {
     if (timeLeft <= 0) {
       clearInterval(interval);
       gameOver = true;
@@ -232,6 +240,7 @@ function startCountdown() {
     }
   }, 1000);
 }
+
 
   function goHome() {
     window.location.href = "/?user=" + encodeURIComponent(username);
